@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>String Weaver</title>
+<style>
+  :root {
+    --ink: #1c1b19;
+    --paper: #f7f5f0;
+    --thread-a: #2f6f5e;
+    --thread-b: #b5502e;
+    --line: #d8d3c7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    padding: 24px;
+  }
+
+  main {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 500;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  p.sub {
+    margin: 0 0 36px;
+    color: #6b6558;
+    font-size: 1.05rem;
+    max-width: 46ch;
+  }
+
+  .field {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+
+  .field input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1.05rem;
+    padding: 12px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  #wordA:focus { border-color: var(--thread-a); }
+  #wordB:focus { border-color: var(--thread-b); }
+
+  .field.a input { border-left: 4px solid var(--thread-a); }
+  .field.b input { border-left: 4px solid var(--thread-b); }
+
+  button {
+    font-family: inherit;
+    font-size: 1.05rem;
+    padding: 12px 22px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  button:hover { background: #3a3730; }
+
+  .result {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    min-height: 60px;
+  }
+
+  .result .label {
+    font-size: 0.9rem;
+    color: #6b6558;
+    margin-bottom: 10px;
+  }
+
+  .woven {
+    font-size: 1.7rem;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .woven .a { color: var(--thread-a); }
+  .woven .b { color: var(--thread-b); }
+
+  .empty {
+    color: #a29c8c;
+    font-size: 1rem;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>String Weaver</h1>
+  <p class="sub">Enter two words or phrases, and they'll be woven together letter by letter.</p>
+
+  <div class="field a">
+    <label for="wordA">First string</label>
+    <input type="text" id="wordA" placeholder="e.g. hello" autocomplete="off">
+  </div>
+
+  <div class="field b">
+    <label for="wordB">Second string</label>
+    <input type="text" id="wordB" placeholder="e.g. world" autocomplete="off">
+  </div>
+
+  <button id="weaveBtn">Weave strings</button>
+
+  <div class="result">
+    <div class="label">Result</div>
+    <div id="output" class="woven"><span class="empty">Nothing woven yet.</span></div>
+  </div>
+</main>
+
+<script>
+  function weave(a, b) {
+    const maxLen = Math.max(a.length, b.length);
+    let combined = '';
+    for (let i = 0; i < maxLen; i++) {
+      if (i < a.length) combined += a[i];
+      if (i < b.length) combined += b[i];
+    }
+    return combined;
+  }
+
+  function renderResult(a, b) {
+    const output = document.getElementById('output');
+
+    if (!a && !b) {
+      output.innerHTML = '<span class="empty">Nothing woven yet.</span>';
+      return;
+    }
+
+    const maxLen = Math.max(a.length, b.length);
+    let html = '';
+    for (let i = 0; i < maxLen; i++) {
+      if (i < a.length) html += `<span class="a">${escapeHtml(a[i])}</span>`;
+      if (i < b.length) html += `<span class="b">${escapeHtml(b[i])}</span>`;
+    }
+    output.innerHTML = html;
+  }
+
+  function escapeHtml(ch) {
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    return map[ch] || ch;
+  }
+
+  const wordA = document.getElementById('wordA');
+  const wordB = document.getElementById('wordB');
+  const weaveBtn = document.getElementById('weaveBtn');
+
+  function doWeave() {
+    renderResult(wordA.value, wordB.value);
+  }
+
+  weaveBtn.addEventListener('click', doWeave);
+  wordA.addEventListener('keyup', (e) => { if (e.key === 'Enter') doWeave(); });
+  wordB.addEventListener('keyup', (e) => { if (e.key === 'Enter') doWeave(); });
+</script>
+</body>
+</html>
